@@ -1,0 +1,8 @@
+.env
+node_modules/
+dist/
+*.log
+pentest/evidencias/**/*.html
+pentest/evidencias/**/*.json
+pentest/evidencias/**/*.xml
+.DS_Store

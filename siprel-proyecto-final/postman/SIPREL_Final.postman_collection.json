@@ -1,0 +1,15 @@
+{
+  "info": {"name":"SIPREL Proyecto Final","schema":"https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
+  "variable": [
+    {"key":"baseUrl","value":"https://localhost:8443/api/v1"},
+    {"key":"token","value":""}
+  ],
+  "item": [
+    {"name":"Auth","item":[
+      {"name":"Login admin","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"usuario\":\"admin\",\"password\":\"Admin123!\"}"},"url":{"raw":"{{baseUrl}}/auth/login","host":["{{baseUrl}}"],"path":["auth","login"]}},"event":[{"listen":"test","script":{"exec":["if (pm.response.code === 200) pm.collectionVariables.set('token', pm.response.json().token);"]}}]},
+      {"name":"Registro solicitante","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"usuario\":\"alumno01\",\"password\":\"Alumno123!\",\"nombre\":\"Alumno Demo\",\"email\":\"alumno01@siprel.local\"}"},"url":{"raw":"{{baseUrl}}/auth/registro","host":["{{baseUrl}}"],"path":["auth","registro"]}}}
+    ]},
+    {"name":"Equipos","item":[{"name":"Buscar","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/equipos?buscar=Dell","host":["{{baseUrl}}"],"path":["equipos"],"query":[{"key":"buscar","value":"Dell"}]}}}]},
+    {"name":"Admin","item":[{"name":"Listar usuarios","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/admin/usuarios","host":["{{baseUrl}}"],"path":["admin","usuarios"]}}},{"name":"Auditoria","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/admin/auditoria","host":["{{baseUrl}}"],"path":["admin","auditoria"]}}}]}
+  ]
+}

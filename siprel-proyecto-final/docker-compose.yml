@@ -1,0 +1,70 @@
+services:
+  db:
+    image: mariadb:11.4
+    container_name: siprel-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: siprel_db
+      MARIADB_USER: siprel_app
+      MARIADB_PASSWORD: ${DB_APP_PASSWORD}
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - siprel_db_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [siprel-network]
+
+  api:
+    build: { context: ./backend }
+    container_name: siprel-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: siprel_db
+      DB_USER: siprel_app
+      DB_PASSWORD: ${DB_APP_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 15m
+      BCRYPT_ROUNDS: 12
+      CORS_ORIGINS: https://localhost:8443
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      db: { condition: service_healthy }
+    networks: [siprel-network]
+
+  frontend:
+    build: { context: ./frontend }
+    container_name: siprel-frontend
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+      - "8443:443"
+    depends_on: [api]
+    networks: [siprel-network]
+
+  adminer:
+    image: adminer:4.8.1
+    container_name: siprel-adminer
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      db: { condition: service_healthy }
+    networks: [siprel-network]
+
+volumes:
+  siprel_db_data:
+
+networks:
+  siprel-network:
+    driver: bridge
